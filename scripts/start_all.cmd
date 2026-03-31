@@ -1,47 +1,47 @@
+@chcp 1251 >nul
 @echo off
-chcp 65001 >nul
 setlocal
 
 echo ===============================
-echo Ð Ð°Ð´Ð°Ñ€ Ñ‚Ñ€ÐµÐ½Ð´Ð¾Ð² â€” Ð±Ñ‹ÑÑ‚Ñ€Ñ‹Ð¹ Ð·Ð°Ð¿ÑƒÑÐº
+echo Ðàäàð òðåíäîâ — áûñòðûé çàïóñê
 echo ===============================
-echo Ð­Ñ‚Ð¾Ñ‚ ÑÐºÑ€Ð¸Ð¿Ñ‚ Ð¿Ð¾Ð´Ð½Ð¸Ð¼Ð°ÐµÑ‚ Ollama, Ð·Ð°Ð¿ÑƒÑÐºÐ°ÐµÑ‚ Ð¿Ð°Ð¹Ð¿Ð»Ð°Ð¹Ð½ Ð¸ API.
-echo
+echo Ýòîò ñêðèïò ïîäíèìàåò Ollama, çàïóñêàåò ïàéïëàéí è API.
+echo.
 set "REPO_ROOT=%~dp0.."
 
 pushd "%REPO_ROOT%" >nul
 
 call :check_ollama
 if errorlevel 1 (
-  echo Ollama Ð½Ðµ Ð·Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð°. ÐŸÑ‹Ñ‚Ð°ÑŽÑÑŒ ÑÑ‚Ð°Ñ€Ñ‚Ð¾Ð²Ð°Ñ‚ÑŒ...
+  echo Ollama íå çàïóùåíà. Ïûòàþñü ñòàðòîâàòü...
   start "" /min ollama serve
   timeout /t 2 >nul
   call :check_ollama
   if errorlevel 1 (
-    echo ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð·Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚ÑŒ Ollama. ÐŸÑ€Ð¾Ð´Ð¾Ð»Ð¶Ð°ÑŽ Ð±ÐµÐ· Ð½ÐµÐµ.
+    echo Íå óäàëîñü çàïóñòèòü Ollama. Ïðîäîëæàþ áåç íåå.
   ) else (
-    echo Ollama Ð·Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð°.
+    echo Ollama çàïóùåíà.
   )
 ) else (
-  echo Ollama ÑƒÐ¶Ðµ Ð·Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð°.
+  echo Ollama óæå çàïóùåíà.
 )
 
-echo
-echo Ð—Ð°Ð¿ÑƒÑÐº Ð¿Ð°Ð¹Ð¿Ð»Ð°Ð¹Ð½Ð°...
+echo.
+echo Çàïóñê ïàéïëàéíà...
 "C:\Python314\python.exe" backend\scripts\run_pipeline.py
 
-echo
-echo Ð—Ð°Ð¿ÑƒÑÐº API...
+echo.
+echo Çàïóñê API...
 start "" "C:\Python314\python.exe" backend\scripts\serve_api.py --host 127.0.0.1 --port 8000
 
 if /I "%1"=="front" (
-  echo ÐžÑ‚ÐºÑ€Ñ‹Ð²Ð°ÑŽ Ñ„Ñ€Ð¾Ð½Ñ‚...
-  start "" "%REPO_ROOT%\Ð¤Ñ€Ð¾Ð½Ñ‚\index.html"
+  echo Îòêðûâàþ ôðîíò...
+  start "" "%REPO_ROOT%\Ôðîíò\index.html"
 )
 
-echo
-echo Ð“Ð¾Ñ‚Ð¾Ð²Ð¾. ÐžÑ‚ÐºÑ€Ð¾Ð¹: "%REPO_ROOT%\Ð¤Ñ€Ð¾Ð½Ñ‚\index.html"
-echo
+echo.
+echo Ãîòîâî. Îòêðîé: "%REPO_ROOT%\Ôðîíò\index.html"
+echo.
 
 popd >nul
 exit /b 0
