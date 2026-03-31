@@ -1,0 +1,1 @@
+﻿"""Trend Radar Python package."""
