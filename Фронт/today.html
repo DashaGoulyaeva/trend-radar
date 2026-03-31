@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trend Radar — Сегодня</title>
+    <title>Радар трендов — Сегодня</title>
     <link rel="stylesheet" href="assets/styles.css" />
   </head>
   <body data-page="today">
     <div class="layout">
       <aside class="sidebar">
-        <div class="brand">Trend Radar</div>
+        <div class="brand">Радар трендов</div>
         <nav class="nav">
           <a href="today.html" data-page="today">Сегодня</a>
           <a href="week.html" data-page="week">Неделя</a>
@@ -25,11 +25,12 @@
         <p class="subtle">Сигналы за последние 24 часа и краткая интерпретация.</p>
 
         <div class="toolbar">
-          <select>
+          <select disabled>
             <option>Общий</option>
             <option>Пуш</option>
             <option>Канал</option>
           </select>
+          <span class="soon">Скоро</span>
           <button class="button secondary" id="refreshBtn">Обновить</button>
           <a class="button secondary" href="trend.html">Открыть карточку</a>
         </div>
@@ -42,7 +43,10 @@
           </div>
           <div id="stateError" class="state">
             <span id="errorText">Нет связи с API.</span>
-            <div><button class="button secondary" id="retryBtn">Повторить</button></div>
+            <div style="margin-top: 12px;">
+              <button class="button secondary" id="retryBtn">Повторить</button>
+              <button class="button" id="installBtn">Установить зависимости</button>
+            </div>
           </div>
 
           <div id="trendList" class="trend-list"></div>
@@ -63,4 +67,3 @@
     </script>
   </body>
 </html>
-

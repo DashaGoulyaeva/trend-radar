@@ -1,7 +1,8 @@
 ﻿const DEFAULT_API = "http://127.0.0.1:8000";
+const INSTALL_CMD = "python -m pip install -r backend/requirements.txt";
 
 function getApiBase() {
-  return localStorage.getItem("tr_api") || DEFAULT_API;
+  return localStorage.getItem("rt_api") || DEFAULT_API;
 }
 
 function setActiveNav() {
@@ -11,6 +12,15 @@ function setActiveNav() {
       link.classList.add("active");
     }
   });
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function fetchTrends(windowValue) {
@@ -24,7 +34,9 @@ async function fetchTrends(windowValue) {
   return Array.isArray(data.items) ? data.items : [];
 }
 
-function normalizeItem(item) {
+function normalizeItem(item, fallbackWindow) {
+  const evidence = Array.isArray(item.evidence) ? item.evidence : [];
+  const first = evidence[0] || {};
   return {
     id: item.id,
     title: item.title || "Без названия",
@@ -32,22 +44,58 @@ function normalizeItem(item) {
     verdict: item.verdict || "unknown",
     why: item.why_live || item.whyLive || "",
     scene: item.scene || "",
-    risk: item.risk || "",
+    risk: item.risk || "—",
     angles: Array.isArray(item.angles) ? item.angles : [],
-    evidence: Array.isArray(item.evidence) ? item.evidence : [],
+    window: item.window || fallbackWindow || "today",
+    confidence: item.confidence ?? item.confidence_score ?? "—",
+    capturedAt: item.captured_at || first.captured_at || "—",
+    updatedAt: item.updated_at || "—",
+    locale: item.locale || "—",
+    source: first.source_key || "—",
+    url: first.url || "",
   };
 }
 
-function renderTrendList(target, items) {
+function renderTrendList(target, items, fallbackWindow) {
   target.innerHTML = "";
   items.forEach((raw) => {
-    const item = normalizeItem(raw);
+    const item = normalizeItem(raw, fallbackWindow);
     const card = document.createElement("article");
     card.className = "trend";
+    card.addEventListener("click", () => {
+      window.location.href = `trend.html?id=${encodeURIComponent(item.id)}`;
+    });
 
     const left = document.createElement("div");
     const title = document.createElement("h3");
     title.textContent = item.title;
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const source = document.createElement("span");
+    source.textContent = `Источник: ${item.source}`;
+    meta.appendChild(source);
+
+    const link = document.createElement("span");
+    if (item.url) {
+      link.innerHTML = `Ссылка: <a href="${item.url}" target="_blank">${item.url}</a>`;
+    } else {
+      link.textContent = "Ссылка: —";
+    }
+    meta.appendChild(link);
+
+    const captured = document.createElement("span");
+    captured.textContent = `captured_at: ${item.capturedAt}`;
+    meta.appendChild(captured);
+
+    const updated = document.createElement("span");
+    updated.textContent = `updated_at: ${item.updatedAt}`;
+    meta.appendChild(updated);
+
+    const locale = document.createElement("span");
+    locale.textContent = `locale: ${item.locale}`;
+    meta.appendChild(locale);
+
     const why = document.createElement("p");
     why.textContent = item.why || "Ожидаем интерпретацию от Ollama.";
 
@@ -58,14 +106,32 @@ function renderTrendList(target, items) {
     verdict.className = "badge";
     verdict.textContent = item.verdict;
 
-    const scene = document.createElement("span");
-    scene.className = "badge";
-    scene.textContent = item.scene || "Сцена не указана";
+    const risk = document.createElement("span");
+    risk.className = "badge";
+    risk.textContent = `risk: ${item.risk}`;
+
+    const confidence = document.createElement("span");
+    confidence.className = "badge";
+    confidence.textContent = `confidence: ${item.confidence}`;
+
+    const windowBadge = document.createElement("span");
+    windowBadge.className = "badge";
+    windowBadge.textContent = `window: ${item.window}`;
 
     badges.appendChild(verdict);
-    badges.appendChild(scene);
+    badges.appendChild(risk);
+    badges.appendChild(confidence);
+    badges.appendChild(windowBadge);
+
+    if (item.window === "week") {
+      const forecast = document.createElement("span");
+      forecast.className = "badge forecast";
+      forecast.textContent = "прогноз";
+      badges.appendChild(forecast);
+    }
 
     left.appendChild(title);
+    left.appendChild(meta);
     left.appendChild(why);
     left.appendChild(badges);
 
@@ -97,6 +163,7 @@ async function loadTrendsPage(windowValue) {
   const stateEmpty = document.getElementById("stateEmpty");
   const stateError = document.getElementById("stateError");
   const errorText = document.getElementById("errorText");
+  const installBtn = document.getElementById("installBtn");
 
   const setState = (state) => {
     stateLoading.classList.toggle("active", state === "loading");
@@ -113,10 +180,16 @@ async function loadTrendsPage(windowValue) {
       return;
     }
     setState("ready");
-    renderTrendList(list, items);
+    renderTrendList(list, items, windowValue);
   } catch (error) {
     setState("error");
     errorText.textContent = `Ошибка: ${error.message}. Проверь backend.`;
+    if (installBtn) {
+      installBtn.addEventListener("click", async () => {
+        const ok = await copyToClipboard(INSTALL_CMD);
+        installBtn.textContent = ok ? "Команда скопирована" : "Скопируй вручную";
+      });
+    }
   }
 }
 
@@ -136,16 +209,25 @@ async function loadTrendDetail() {
       detail.innerHTML = "<p class=\"subtle\">Тренд не найден.</p>";
       return;
     }
-    const item = normalizeItem(match);
+    const item = normalizeItem(match, "today");
     detail.innerHTML = `
       <div class="panel">
         <h2>${item.title}</h2>
         <p class="subtle">${item.why || "Без интерпретации."}</p>
+        <div class="meta">
+          <span>Источник: ${item.source}</span>
+          <span>captured_at: ${item.capturedAt}</span>
+          <span>updated_at: ${item.updatedAt}</span>
+          <span>locale: ${item.locale}</span>
+        </div>
         <div class="badges">
           <span class="badge">${item.verdict}</span>
-          <span class="badge">${item.scene || "Сцена не указана"}</span>
-          <span class="badge">Риск: ${item.risk || "—"}</span>
+          <span class="badge">risk: ${item.risk}</span>
+          <span class="badge">confidence: ${item.confidence}</span>
+          <span class="badge">window: ${item.window}</span>
+          ${item.window === "week" ? '<span class="badge forecast">прогноз</span>' : ""}
         </div>
+        <div class="subtle" style="margin-top: 12px;">Ссылка: ${item.url ? `<a href="${item.url}" target="_blank">${item.url}</a>` : "—"}</div>
       </div>
     `;
   } catch (error) {
@@ -183,15 +265,33 @@ async function loadSourcesPage() {
 function setupSettings() {
   const input = document.getElementById("apiInput");
   const status = document.getElementById("apiStatus");
+  const checkBtn = document.getElementById("checkApi");
   input.value = getApiBase();
+
   document.getElementById("saveApi").addEventListener("click", () => {
     const value = input.value.trim();
     if (!value) {
       status.textContent = "API не может быть пустым.";
+      status.className = "status error";
       return;
     }
-    localStorage.setItem("tr_api", value);
+    localStorage.setItem("rt_api", value);
     status.textContent = "Сохранено. Обнови страницы.";
+    status.className = "status ok";
+  });
+
+  checkBtn.addEventListener("click", async () => {
+    try {
+      const response = await fetch(`${getApiBase()}/api/trends`);
+      if (!response.ok) {
+        throw new Error("bad response");
+      }
+      status.textContent = "API доступен";
+      status.className = "status ok";
+    } catch {
+      status.textContent = "API недоступен";
+      status.className = "status error";
+    }
   });
 }
 
@@ -209,7 +309,7 @@ function setupAdminPage() {
       state.textContent = "";
       list.innerHTML = "";
       items.forEach((raw) => {
-        const item = normalizeItem(raw);
+        const item = normalizeItem(raw, "today");
         const block = document.createElement("div");
         block.className = "panel";
         block.innerHTML = `
@@ -219,23 +319,29 @@ function setupAdminPage() {
             <label>Скоринг<br /><input class="input" value="${item.score || ""}" data-field="score" /></label>
           </div>
           <label style="display:block;margin-top:12px;">Заметка<br /><input class="input" value="" data-field="admin_note" /></label>
+          <div class="status" data-status>Статус: ожидает</div>
           <div style="margin-top:16px;">
             <button class="button" data-action="save">Сохранить</button>
           </div>
         `;
+        const statusEl = block.querySelector("[data-status]");
         block.querySelector("[data-action='save']").addEventListener("click", async () => {
           const verdict = block.querySelector("[data-field='verdict']").value;
           const score = Number(block.querySelector("[data-field='score']").value);
           const adminNote = block.querySelector("[data-field='admin_note']").value;
+          statusEl.textContent = "Статус: сохранение…";
+          statusEl.className = "status";
           try {
             await fetch(`${apiBase}/api/trends/${item.id}/admin`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ verdict, score, admin_note: adminNote }),
             });
-            block.querySelector("[data-action='save']").textContent = "Сохранено";
+            statusEl.textContent = "Статус: сохранено";
+            statusEl.className = "status ok";
           } catch {
-            block.querySelector("[data-action='save']").textContent = "Ошибка";
+            statusEl.textContent = "Статус: ошибка";
+            statusEl.className = "status error";
           }
         });
         list.appendChild(block);
@@ -269,4 +375,3 @@ document.addEventListener("DOMContentLoaded", () => {
     setupAdminPage();
   }
 });
-

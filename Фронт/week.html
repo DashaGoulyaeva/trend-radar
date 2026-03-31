@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trend Radar — Неделя</title>
+    <title>Радар трендов — Неделя</title>
     <link rel="stylesheet" href="assets/styles.css" />
   </head>
   <body data-page="week">
     <div class="layout">
       <aside class="sidebar">
-        <div class="brand">Trend Radar</div>
+        <div class="brand">Радар трендов</div>
         <nav class="nav">
           <a href="today.html" data-page="today">Сегодня</a>
           <a href="week.html" data-page="week">Неделя</a>
@@ -33,7 +33,10 @@
           <div id="stateEmpty" class="state">Пока пусто. Сначала запусти пайплайн.</div>
           <div id="stateError" class="state">
             <span id="errorText">Нет связи с API.</span>
-            <div><button class="button secondary" id="retryBtn">Повторить</button></div>
+            <div style="margin-top: 12px;">
+              <button class="button secondary" id="retryBtn">Повторить</button>
+              <button class="button" id="installBtn">Установить зависимости</button>
+            </div>
           </div>
 
           <div id="trendList" class="trend-list"></div>
@@ -47,4 +50,3 @@
     </script>
   </body>
 </html>
-
