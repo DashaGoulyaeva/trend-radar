@@ -13,7 +13,7 @@ from trend_radar.storage.json_store import read_json, write_json
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*", "null"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

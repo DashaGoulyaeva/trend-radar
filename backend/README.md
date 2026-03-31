@@ -52,3 +52,7 @@ python backend/scripts/serve_api.py --host 127.0.0.1 --port 8000
 - `admin_notes`: list[string]
 - `locale`: по умолчанию `ru-RU`
 - `region_bias_score`: float (заглушка)
+
+## CORS (file://)
+
+Для работы `file://` у фронтенда разрешён `Origin: null` в CORS. API принимает `*` и `null`.
