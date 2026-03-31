@@ -1,0 +1,34 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trend Radar — Админ</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body data-page="admin">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">Trend Radar</div>
+        <nav class="nav">
+          <a href="today.html" data-page="today">Сегодня</a>
+          <a href="week.html" data-page="week">Неделя</a>
+          <a href="trend.html" data-page="trend">Карточка</a>
+          <a href="admin.html" data-page="admin">Админ</a>
+          <a href="sources.html" data-page="sources">Источники</a>
+          <a href="settings.html" data-page="settings">Настройки</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <h1 class="page-title">Админ‑модерация</h1>
+        <p class="subtle">Ручная оценка, правка вердикта и заметок.</p>
+
+        <div id="adminState" class="subtle" style="margin-bottom: 16px;"></div>
+        <div id="adminList" class="grid"></div>
+      </main>
+    </div>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
+

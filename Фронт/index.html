@@ -1,0 +1,59 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trend Radar — фронт</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body data-page="home">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">Trend Radar</div>
+        <nav class="nav">
+          <a href="today.html" data-page="today">Сегодня</a>
+          <a href="week.html" data-page="week">Неделя</a>
+          <a href="trend.html" data-page="trend">Карточка</a>
+          <a href="admin.html" data-page="admin">Админ</a>
+          <a href="sources.html" data-page="sources">Источники</a>
+          <a href="settings.html" data-page="settings">Настройки</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <h1 class="page-title">Trend Radar — локальный фронт</h1>
+        <p class="subtle">
+          Выбери раздел слева. Все страницы работают напрямую при открытии file:// и
+          тянут данные из локального API.
+        </p>
+
+        <div class="grid two" style="margin-top: 32px;">
+          <div class="panel">
+            <h2>Сегодня</h2>
+            <p class="subtle">Свежие сигналы и редакторские выводы.</p>
+            <a class="button" href="today.html">Открыть</a>
+          </div>
+          <div class="panel">
+            <h2>Неделя</h2>
+            <p class="subtle">Weekly‑поле согласования и сценарии.</p>
+            <a class="button" href="week.html">Открыть</a>
+          </div>
+          <div class="panel">
+            <h2>Модерация</h2>
+            <p class="subtle">Ручная правка скоринга и вердиктов.</p>
+            <a class="button" href="admin.html">Открыть</a>
+          </div>
+          <div class="panel">
+            <h2>Источники</h2>
+            <p class="subtle">Качество и покрытие сигналов.</p>
+            <a class="button" href="sources.html">Открыть</a>
+          </div>
+        </div>
+
+        <div class="footer">API по умолчанию: http://127.0.0.1:8000</div>
+      </main>
+    </div>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
+

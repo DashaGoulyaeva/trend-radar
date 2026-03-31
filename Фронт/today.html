@@ -1,0 +1,66 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trend Radar — Сегодня</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body data-page="today">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">Trend Radar</div>
+        <nav class="nav">
+          <a href="today.html" data-page="today">Сегодня</a>
+          <a href="week.html" data-page="week">Неделя</a>
+          <a href="trend.html" data-page="trend">Карточка</a>
+          <a href="admin.html" data-page="admin">Админ</a>
+          <a href="sources.html" data-page="sources">Источники</a>
+          <a href="settings.html" data-page="settings">Настройки</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <h1 class="page-title">Сегодняшние поводы</h1>
+        <p class="subtle">Сигналы за последние 24 часа и краткая интерпретация.</p>
+
+        <div class="toolbar">
+          <select>
+            <option>Общий</option>
+            <option>Пуш</option>
+            <option>Канал</option>
+          </select>
+          <button class="button secondary" id="refreshBtn">Обновить</button>
+          <a class="button secondary" href="trend.html">Открыть карточку</a>
+        </div>
+
+        <div class="panel">
+          <div id="stateLoading" class="state active">Собираем ленту…</div>
+          <div id="stateEmpty" class="state">
+            Пока пусто. Запусти пайплайн и обнови страницу.
+            <div><button class="button" id="runPipelineBtn">Запустить пайплайн</button></div>
+          </div>
+          <div id="stateError" class="state">
+            <span id="errorText">Нет связи с API.</span>
+            <div><button class="button secondary" id="retryBtn">Повторить</button></div>
+          </div>
+
+          <div id="trendList" class="trend-list"></div>
+        </div>
+      </main>
+    </div>
+    <script src="assets/app.js"></script>
+    <script>
+      document.getElementById("refreshBtn").addEventListener("click", () => {
+        window.location.reload();
+      });
+      document.getElementById("retryBtn").addEventListener("click", () => {
+        window.location.reload();
+      });
+      document.getElementById("runPipelineBtn").addEventListener("click", () => {
+        alert("Запусти: python backend/scripts/run_pipeline.py");
+      });
+    </script>
+  </body>
+</html>
+

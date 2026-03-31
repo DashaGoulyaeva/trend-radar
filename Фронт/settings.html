@@ -1,0 +1,40 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trend Radar — Настройки</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body data-page="settings">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">Trend Radar</div>
+        <nav class="nav">
+          <a href="today.html" data-page="today">Сегодня</a>
+          <a href="week.html" data-page="week">Неделя</a>
+          <a href="trend.html" data-page="trend">Карточка</a>
+          <a href="admin.html" data-page="admin">Админ</a>
+          <a href="sources.html" data-page="sources">Источники</a>
+          <a href="settings.html" data-page="settings">Настройки</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <h1 class="page-title">Настройки</h1>
+        <p class="subtle">Укажи адрес локального API.</p>
+
+        <div class="panel">
+          <label class="subtle">API URL</label>
+          <input id="apiInput" class="input" type="text" placeholder="http://127.0.0.1:8000" />
+          <div style="margin-top: 12px;">
+            <button class="button" id="saveApi">Сохранить</button>
+          </div>
+          <div id="apiStatus" class="subtle" style="margin-top: 12px;"></div>
+        </div>
+      </main>
+    </div>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
+
