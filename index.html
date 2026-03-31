@@ -1,0 +1,471 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trend Radar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #ffffff;
+        --ink: #0d1323;
+        --muted: rgba(13, 19, 35, 0.55);
+        --line: rgba(13, 19, 35, 0.1);
+        --accent: #0d1323;
+        --accent-soft: rgba(13, 19, 35, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Crimson Pro", Georgia, serif;
+        color: var(--ink);
+        background: var(--bg);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .page {
+        min-height: 100vh;
+      }
+
+      .header {
+        position: sticky;
+        top: 0;
+        background: #ffffff;
+        border-bottom: 1px solid var(--line);
+        z-index: 10;
+      }
+
+      .header__inner {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 24px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        font-size: 1.1rem;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+
+      .chip {
+        font-family: "Inter", sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--muted);
+      }
+
+      .hero {
+        max-width: 840px;
+        margin: 0 auto;
+        padding: 96px 32px 40px;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.4rem, 4vw, 3.4rem);
+        line-height: 1.12;
+        margin-bottom: 32px;
+      }
+
+      .prompt {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .prompt input {
+        border: none;
+        border-bottom: 1px solid var(--line);
+        padding: 16px 0;
+        font-size: 1.3rem;
+        background: transparent;
+        color: var(--ink);
+        font-family: "Crimson Pro", serif;
+        outline: none;
+      }
+
+      .prompt input::placeholder {
+        color: rgba(13, 19, 35, 0.25);
+      }
+
+      .prompt__row {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-family: "Inter", sans-serif;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .prompt__row select {
+        border: none;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+        padding: 6px 0;
+        font-family: "Inter", sans-serif;
+        color: var(--muted);
+      }
+
+      .prompt__row button {
+        border: none;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+      }
+
+      .prompt__row button:hover {
+        opacity: 0.6;
+      }
+
+      .section {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 40px 32px 120px;
+      }
+
+      .section h2 {
+        font-size: 2rem;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 16px;
+      }
+
+      .states {
+        padding: 24px 0;
+        font-family: "Inter", sans-serif;
+        color: var(--muted);
+      }
+
+      .state {
+        display: none;
+        padding: 24px 0;
+      }
+
+      .state.active {
+        display: block;
+      }
+
+      .state button {
+        margin-top: 12px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-family: "Inter", sans-serif;
+        cursor: pointer;
+      }
+
+      .trend-list {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .trend {
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+      }
+
+      .trend:last-child {
+        border-bottom: none;
+      }
+
+      .trend h3 {
+        margin: 0 0 8px;
+        font-size: 1.4rem;
+      }
+
+      .trend p {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-family: "Inter", sans-serif;
+        font-size: 0.8rem;
+      }
+
+      .badge {
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+      }
+
+      .score {
+        font-family: "Inter", sans-serif;
+        font-size: 1.6rem;
+        font-weight: 500;
+      }
+
+      .angles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+        font-family: "Inter", sans-serif;
+        font-size: 0.8rem;
+      }
+
+      .angle {
+        padding: 6px 10px;
+        background: rgba(13, 19, 35, 0.05);
+        border-radius: 999px;
+      }
+
+      .footer {
+        padding: 32px;
+        font-family: "Inter", sans-serif;
+        color: var(--muted);
+        font-size: 0.85rem;
+        text-align: center;
+      }
+
+      .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        background: var(--ink);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 12px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 0.2s ease;
+        font-family: "Inter", sans-serif;
+        font-size: 0.85rem;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 720px) {
+        .header__inner {
+          padding: 20px;
+        }
+
+        .hero {
+          padding: 80px 20px 32px;
+        }
+
+        .section {
+          padding: 32px 20px 80px;
+        }
+
+        .trend {
+          grid-template-columns: 1fr;
+        }
+
+        .score {
+          margin-top: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="header__inner">
+          <div class="brand">Trend Radar</div>
+          <div class="chip">Local</div>
+        </div>
+      </header>
+
+      <section class="hero">
+        <h1>Что сейчас можно сказать уместно и живо?</h1>
+        <div class="prompt">
+          <input type="text" placeholder="Опиши тему, нишу или формат…" />
+          <div class="prompt__row">
+            <select>
+              <option>Общий</option>
+              <option>Пуш</option>
+              <option>Канал</option>
+            </select>
+            <button id="refreshBtn">Сканировать →</button>
+            <button id="openApiBtn">Открыть API</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Сегодняшние поводы</h2>
+
+        <div class="states">
+          <div id="stateLoading" class="state active">Собираем ленту и проверяем сигналы…</div>
+          <div id="stateEmpty" class="state">
+            Пока пусто. Запусти пайплайн и обнови страницу.
+            <div>
+              <button id="runPipelineBtn">Запустить пайплайн</button>
+            </div>
+          </div>
+          <div id="stateError" class="state">
+            <span id="errorText">Нет связи с API. Проверь backend.</span>
+            <div>
+              <button id="retryBtn">Повторить</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="trendList" class="trend-list"></div>
+      </section>
+
+      <footer class="footer">
+        Trend Radar работает локально. Данные приходят из API `http://127.0.0.1:8000/api/trends`.
+      </footer>
+    </div>
+
+    <div id="toast" class="toast">Команда скопирована</div>
+
+    <script>
+      const API_URL = "http://127.0.0.1:8000/api/trends";
+      const trendList = document.getElementById("trendList");
+      const stateLoading = document.getElementById("stateLoading");
+      const stateEmpty = document.getElementById("stateEmpty");
+      const stateError = document.getElementById("stateError");
+      const errorText = document.getElementById("errorText");
+      const toast = document.getElementById("toast");
+      const refreshBtn = document.getElementById("refreshBtn");
+      const retryBtn = document.getElementById("retryBtn");
+      const openApiBtn = document.getElementById("openApiBtn");
+      const runPipelineBtn = document.getElementById("runPipelineBtn");
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1600);
+      }
+
+      function setState(state) {
+        stateLoading.classList.toggle("active", state === "loading");
+        stateEmpty.classList.toggle("active", state === "empty");
+        stateError.classList.toggle("active", state === "error");
+      }
+
+      function normalizeItem(item) {
+        return {
+          id: item.id || Math.random().toString(36).slice(2),
+          title: item.title || "Без названия",
+          score: Number.isFinite(item.score) ? item.score : item.predictive_score,
+          verdict: item.verdict || "unknown",
+          why: item.why_live || item.whyLive || "",
+          scene: item.scene || "",
+          risk: item.risk || "",
+          angles: Array.isArray(item.angles) ? item.angles : [],
+        };
+      }
+
+      function renderTrends(items) {
+        trendList.innerHTML = "";
+        items.forEach((raw) => {
+          const item = normalizeItem(raw);
+          const card = document.createElement("article");
+          card.className = "trend";
+
+          const left = document.createElement("div");
+          const title = document.createElement("h3");
+          title.textContent = item.title;
+          const why = document.createElement("p");
+          why.textContent = item.why || "Ожидаем интерпретацию от Ollama.";
+
+          const badges = document.createElement("div");
+          badges.className = "badge-row";
+
+          const verdict = document.createElement("span");
+          verdict.className = "badge";
+          verdict.textContent = item.verdict;
+
+          const scene = document.createElement("span");
+          scene.className = "badge";
+          scene.textContent = item.scene || "Сцена не указана";
+
+          badges.appendChild(verdict);
+          badges.appendChild(scene);
+
+          left.appendChild(title);
+          left.appendChild(why);
+          left.appendChild(badges);
+
+          if (item.angles.length) {
+            const angles = document.createElement("div");
+            angles.className = "angles";
+            item.angles.slice(0, 4).forEach((angle) => {
+              const chip = document.createElement("span");
+              chip.className = "angle";
+              chip.textContent = angle;
+              angles.appendChild(chip);
+            });
+            left.appendChild(angles);
+          }
+
+          const right = document.createElement("div");
+          right.className = "score";
+          right.textContent = Number.isFinite(item.score) ? item.score : "—";
+
+          card.appendChild(left);
+          card.appendChild(right);
+          trendList.appendChild(card);
+        });
+      }
+
+      async function loadTrends() {
+        setState("loading");
+        trendList.innerHTML = "";
+        try {
+          const response = await fetch(API_URL, { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const data = await response.json();
+          const items = Array.isArray(data.items) ? data.items : [];
+          if (!items.length) {
+            setState("empty");
+            return;
+          }
+          setState("ready");
+          renderTrends(items);
+        } catch (error) {
+          setState("error");
+          errorText.textContent = `Ошибка: ${error.message}. Проверь backend.`;
+        }
+      }
+
+      refreshBtn.addEventListener("click", loadTrends);
+      retryBtn.addEventListener("click", loadTrends);
+      openApiBtn.addEventListener("click", () => window.open(API_URL, "_blank"));
+      runPipelineBtn.addEventListener("click", async () => {
+        const command = "python backend/scripts/run_pipeline.py";
+        try {
+          await navigator.clipboard.writeText(command);
+          showToast("Команда скопирована");
+        } catch {
+          showToast("Скопируй команду вручную");
+        }
+      });
+
+      loadTrends();
+    </script>
+  </body>
+</html>
