@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 import subprocess
 import time
 from typing import Any
@@ -52,17 +53,24 @@ def _ollama_healthcheck(settings: Settings) -> bool:
 
 def _autostart_ollama() -> bool:
     try:
+        exe = shutil.which("ollama")
+        if not exe:
+            fallback = r"C:\Users\1\AppData\Local\Programs\Ollama\ollama.exe"
+            if os.path.exists(fallback):
+                exe = fallback
+        if not exe:
+            return False
         if os.name == "nt":
             creationflags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS
             subprocess.Popen(
-                ["ollama", "serve"],
+                [exe, "serve"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 creationflags=creationflags,
             )
         else:
             subprocess.Popen(
-                ["ollama", "serve"],
+                [exe, "serve"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 start_new_session=True,

@@ -8,13 +8,15 @@ echo ===============================
 echo Ётот скрипт поднимает Ollama, запускает пайплайн и API.
 echo.
 set "REPO_ROOT=%~dp0.."
+set "OLLAMA_EXE=C:\Users\1\AppData\Local\Programs\Ollama\ollama.exe"
+if not exist "%OLLAMA_EXE%" set "OLLAMA_EXE=ollama"
 
 pushd "%REPO_ROOT%" >nul
 
 call :check_ollama
 if errorlevel 1 (
   echo Ollama не запущена. ѕытаюсь стартовать...
-  start "" /min ollama serve
+  start "" /min "%OLLAMA_EXE%" serve
   timeout /t 2 >nul
   call :check_ollama
   if errorlevel 1 (
