@@ -1,5 +1,16 @@
 ﻿# Trend Radar
 
+Trend Radar is a trend radar for editors: an RSS/news collector plus a scoring pipeline that turns raw signals into a local dashboard. It runs a Python backend for ingestion, normalization, and scoring, and ships a static frontend for browsing the curated feed.
+
+Quickstart (local):
+1. Install deps (optional): `C:\Python314\python.exe -m pip install -r backend\requirements.txt --target backend\.deps`
+2. Run everything: `scripts\start_all.cmd`
+3. Open the UI: `web\index.html` (or `scripts\start_all.ps1 -OpenFront`)
+
+Project structure (one paragraph): `web/` is the static frontend, `backend/` is the Python backend (pipeline + API), `scripts/` contains local run/ops helpers, `config/` and `docs/` hold configuration and architecture notes, and `data/` is for local artifacts.
+
+---
+
 Локальный редакторский радар сигналов для российской аудитории. На фронте используется название «Радар трендов».
 
 ## Структура

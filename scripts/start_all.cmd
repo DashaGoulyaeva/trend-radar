@@ -3,7 +3,7 @@ chcp 65001 >nul
 setlocal
 
 echo ===============================
-echo Радар трендов — быстрый запуск
+echo Радар трендов - быстрый запуск
 echo ===============================
 echo Этот скрипт поднимает Ollama, запускает пайплайн и API.
 echo.
@@ -34,7 +34,7 @@ if errorlevel 1 (
   if exist "%OLLAMA_EXE%" (
     echo Ollama не запущена. Пытаюсь стартовать...
     start "" /min "%OLLAMA_EXE%" serve
-    timeout /t 2 >nul
+    powershell -NoProfile -Command "Start-Sleep -Seconds 2"
     call :check_ollama
     if errorlevel 1 (
       echo Не удалось запустить Ollama. Продолжаю без нее.
@@ -54,9 +54,9 @@ echo Запуск пайплайна...
 
 echo.
 echo Запуск API...
-start "" /b "%PYTHON_EXE%" backend\scripts\serve_api.py --host 127.0.0.1 --port 8000
+powershell -NoProfile -Command "Start-Process -FilePath '%PYTHON_EXE%' -ArgumentList 'backend\\scripts\\serve_api.py --host 127.0.0.1 --port 8000' -WindowStyle Minimized"
 
-timeout /t 2 >nul
+powershell -NoProfile -Command "Start-Sleep -Seconds 2"
 
 call :check_api
 if errorlevel 1 (
