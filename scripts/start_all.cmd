@@ -1,5 +1,12 @@
-﻿@echo off
+@echo off
+chcp 65001 >nul
 setlocal
+
+echo ===============================
+echo Радар трендов — быстрый запуск
+echo ===============================
+echo Этот скрипт поднимает Ollama, запускает пайплайн и API.
+echo
 set "REPO_ROOT=%~dp0.."
 
 pushd "%REPO_ROOT%" >nul
@@ -19,18 +26,22 @@ if errorlevel 1 (
   echo Ollama уже запущена.
 )
 
+echo
 echo Запуск пайплайна...
-python backend\scripts\run_pipeline.py
+"C:\Python314\python.exe" backend\scripts\run_pipeline.py
 
+echo
 echo Запуск API...
-start "" python backend\scripts\serve_api.py --host 127.0.0.1 --port 8000
+start "" "C:\Python314\python.exe" backend\scripts\serve_api.py --host 127.0.0.1 --port 8000
 
 if /I "%1"=="front" (
   echo Открываю фронт...
   start "" "%REPO_ROOT%\Фронт\index.html"
 )
 
+echo
 echo Готово. Открой: "%REPO_ROOT%\Фронт\index.html"
+echo
 
 popd >nul
 exit /b 0
