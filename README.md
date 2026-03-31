@@ -4,20 +4,21 @@
 
 ## Структура
 
-- `Фронт/` — статический фронт (открывается напрямую через `file://`).
+- `web/` — статический фронт (открывается напрямую через `file://`).
 - `backend/` — Python pipeline + API.
 - `docs/` — архитектура и источники.
 
 ## Быстрый запуск (локально)
 
-1. Установить зависимости:
+1. (Опционально) установить зависимости в локальную папку:
 
 ```bash
-npm i
-python -m pip install -r backend/requirements.txt
+C:\Python314\python.exe -m pip install -r backend\requirements.txt --target backend\.deps
 ```
 
-2. Запустить всё сразу (Ollama + пайплайн + API):
+Скрипт запуска также ставит зависимости автоматически, если не хватает модулей (например, `icalendar`).
+
+2. Запустить всё сразу (Ollama + пайплайн + API, авто-проверка API):
 
 ```bash
 scripts\start_all.cmd
@@ -38,7 +39,7 @@ scripts\start_all.ps1 -OpenFront
 4. Открыть фронт вручную:
 
 ```
-Фронт\index.html
+web\index.html
 ```
 
 UI ожидает API по `http://127.0.0.1:8000/api/trends`.
@@ -60,6 +61,7 @@ UI ожидает API по `http://127.0.0.1:8000/api/trends`.
 - `SOURCE_INCLUDE_GLOBAL` (по умолчанию `false`)
 - `TRANSLATE_TO_RU` (по умолчанию `true`)
 - `SOURCE_RSS_LIMIT`
+- `CALENDAR_ICS_URLS` (список iCal/ICS через запятую)
 - `OLLAMA_BASE_URL` (по умолчанию `http://localhost:11434`)
 - `OLLAMA_MODEL` (по умолчанию `llama3.2:3b`)
 - `OLLAMA_TIMEOUT`

@@ -8,7 +8,7 @@
 
 ## Data flow
 
-1. Collector получает сырые данные.
+1. Collectors получают сырые данные (RSS + календарные поводы).
 2. Enricher добавляет контекст (опционально через Ollama).
 3. Scorer вычисляет базовые оценки.
 4. Pipeline пишет `backend/outputs/trends.json`.

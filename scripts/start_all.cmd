@@ -1,58 +1,106 @@
-@chcp 1251 >nul
 @echo off
+chcp 65001 >nul
 setlocal
 
 echo ===============================
-echo –‡‰‡ ÚÂÌ‰Ó‚ ó ·˚ÒÚ˚È Á‡ÔÛÒÍ
+echo –†–∞–¥–∞—Ä —Ç—Ä–µ–Ω–¥–æ–≤ ‚Äî –±—ã—Å—Ç—Ä—ã–π –∑–∞–ø—É—Å–∫
 echo ===============================
-echo ›ÚÓÚ ÒÍËÔÚ ÔÓ‰ÌËÏ‡ÂÚ Ollama, Á‡ÔÛÒÍ‡ÂÚ Ô‡ÈÔÎ‡ÈÌ Ë API.
+echo –≠—Ç–æ—Ç —Å–∫—Ä–∏–ø—Ç –ø–æ–¥–Ω–∏–º–∞–µ—Ç Ollama, –∑–∞–ø—É—Å–∫–∞–µ—Ç –ø–∞–π–ø–ª–∞–π–Ω –∏ API.
 echo.
 set "REPO_ROOT=%~dp0.."
 set "PYTHON_EXE=C:\Python314\python.exe"
 set "OLLAMA_EXE=C:\Users\1\AppData\Local\Programs\Ollama\ollama.exe"
 
 if not exist "%PYTHON_EXE%" (
-  echo Œ¯Ë·Í‡: Python ÌÂ Ì‡È‰ÂÌ ÔÓ ÔÛÚË "%PYTHON_EXE%".
-  echo ”ÒÚ‡ÌÓ‚Ë Python ËÎË ÔÓÔ‡‚¸ ÔÛÚ¸ ‚ scripts\start_all.cmd.
+  echo –û—à–∏–±–∫–∞: Python –Ω–µ –Ω–∞–π–¥–µ–Ω –ø–æ –ø—É—Ç–∏ "%PYTHON_EXE%".
+  echo –£—Å—Ç–∞–Ω–æ–≤–∏ Python –∏–ª–∏ –ø–æ–ø—Ä–∞–≤—å –ø—É—Ç—å –≤ scripts\start_all.cmd.
   exit /b 1
+)
+
+if not exist "%OLLAMA_EXE%" (
+  echo –ü—Ä–µ–¥—É–ø—Ä–µ–∂–¥–µ–Ω–∏–µ: Ollama –Ω–µ –Ω–∞–π–¥–µ–Ω–∞ –ø–æ –ø—É—Ç–∏ "%OLLAMA_EXE%".
+  echo –ü—Ä–æ–¥–æ–ª–∂–∞—é –±–µ–∑ –∞–≤—Ç–æ–∑–∞–ø—É—Å–∫–∞ Ollama.
 )
 
 pushd "%REPO_ROOT%" >nul
 
+call :ensure_deps
+if errorlevel 1 (
+  echo –ù–µ —É–¥–∞–ª–æ—Å—å —É—Å—Ç–∞–Ω–æ–≤–∏—Ç—å –∑–∞–≤–∏—Å–∏–º–æ—Å—Ç–∏. –ü—Ä–æ–≤–µ—Ä—å –¥–æ—Å—Ç—É–ø –≤ –∏–Ω—Ç–µ—Ä–Ω–µ—Ç –∏ –ø—Ä–∞–≤–∞.
+)
+
 call :check_ollama
 if errorlevel 1 (
-  echo Ollama ÌÂ Á‡ÔÛ˘ÂÌ‡. œ˚Ú‡˛Ò¸ ÒÚ‡ÚÓ‚‡Ú¸...
-  start "" /min "%OLLAMA_EXE%" serve
-  timeout /t 2 >nul
-  call :check_ollama
-  if errorlevel 1 (
-    echo ÕÂ Û‰‡ÎÓÒ¸ Á‡ÔÛÒÚËÚ¸ Ollama. œÓ‰ÓÎÊ‡˛ ·ÂÁ ÌÂÂ.
+  if exist "%OLLAMA_EXE%" (
+    echo Ollama –Ω–µ –∑–∞–ø—É—â–µ–Ω–∞. –ü—ã—Ç–∞—é—Å—å —Å—Ç–∞—Ä—Ç–æ–≤–∞—Ç—å...
+    start "" /min "%OLLAMA_EXE%" serve
+    timeout /t 2 >nul
+    call :check_ollama
+    if errorlevel 1 (
+      echo –ù–µ —É–¥–∞–ª–æ—Å—å –∑–∞–ø—É—Å—Ç–∏—Ç—å Ollama. –ü—Ä–æ–¥–æ–ª–∂–∞—é –±–µ–∑ –Ω–µ–µ.
+    ) else (
+      echo Ollama –∑–∞–ø—É—â–µ–Ω–∞.
+    )
   ) else (
-    echo Ollama Á‡ÔÛ˘ÂÌ‡.
+    echo Ollama –Ω–µ –Ω–∞–π–¥–µ–Ω–∞. –ü—Ä–æ–ø—É—Å–∫–∞—é –∑–∞–ø—É—Å–∫.
   )
 ) else (
-  echo Ollama ÛÊÂ Á‡ÔÛ˘ÂÌ‡.
+  echo Ollama —É–∂–µ –∑–∞–ø—É—â–µ–Ω–∞.
 )
 
 echo.
-echo «‡ÔÛÒÍ Ô‡ÈÔÎ‡ÈÌ‡...
+echo –ó–∞–ø—É—Å–∫ –ø–∞–π–ø–ª–∞–π–Ω–∞...
 "%PYTHON_EXE%" backend\scripts\run_pipeline.py
 
 echo.
-echo «‡ÔÛÒÍ API...
-echo √ÓÚÓ‚Ó. ŒÚÍÓÈ: "%REPO_ROOT%\‘ÓÌÚ\index.html"
+echo –ó–∞–ø—É—Å–∫ API...
+start "" /b "%PYTHON_EXE%" backend\scripts\serve_api.py --host 127.0.0.1 --port 8000
+
+timeout /t 2 >nul
+
+call :check_api
+if errorlevel 1 (
+  echo API –Ω–µ–¥–æ—Å—Ç—É–ø–µ–Ω –ø–æ http://127.0.0.1:8000/api/trends
+) else (
+  echo API –¥–æ—Å—Ç—É–ø–µ–Ω: http://127.0.0.1:8000/api/trends
+)
+
+call :check_ollama
+if errorlevel 1 (
+  echo Ollama –Ω–µ–¥–æ—Å—Ç—É–ø–Ω–∞ –ø–æ http://127.0.0.1:11434/api/tags
+) else (
+  echo Ollama –¥–æ—Å—Ç—É–ø–Ω–∞: http://127.0.0.1:11434/api/tags
+)
+
+echo.
+echo –ì–æ—Ç–æ–≤–æ. –û—Ç–∫—Ä–æ–π: "%REPO_ROOT%\web\index.html"
 echo.
 
 if /I "%1"=="front" (
-  echo ŒÚÍ˚‚‡˛ ÙÓÌÚ...
-  start "" "%REPO_ROOT%\‘ÓÌÚ\index.html"
+  echo –û—Ç–∫—Ä—ã–≤–∞—é —Ñ—Ä–æ–Ω—Ç...
+  start "" "%REPO_ROOT%\web\index.html"
 )
 
-"%PYTHON_EXE%" backend\scripts\serve_api.py --host 127.0.0.1 --port 8000
-
+echo –û–∫–Ω–æ –º–æ–∂–Ω–æ –∑–∞–∫—Ä—ã—Ç—å, –∫–æ–≥–¥–∞ API –±–æ–ª—å—à–µ –Ω–µ –Ω—É–∂–µ–Ω.
 popd >nul
+exit /b 0
+
+:ensure_deps
+if not exist "%REPO_ROOT%\backend\.deps" (
+  mkdir "%REPO_ROOT%\backend\.deps" >nul 2>nul
+)
+"%PYTHON_EXE%" -c "import sys; from pathlib import Path; repo=Path(r'%REPO_ROOT%'); deps=repo/'backend'/'.deps'; src=repo/'backend'/'src'; sys.path[:0]=[str(deps), str(src)]; import icalendar" >nul 2>nul
+if errorlevel 1 (
+  echo –£—Å—Ç–∞–Ω–∞–≤–ª–∏–≤–∞—é –∑–∞–≤–∏—Å–∏–º–æ—Å—Ç–∏ –≤ backend\.deps...
+  "%PYTHON_EXE%" -m pip install -r backend\requirements.txt --target backend\.deps
+  if errorlevel 1 exit /b 1
+)
 exit /b 0
 
 :check_ollama
 powershell -NoProfile -Command "try { (Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:11434/api/tags' -TimeoutSec 2) | Out-Null; exit 0 } catch { exit 1 }"
+exit /b %errorlevel%
+
+:check_api
+powershell -NoProfile -Command "try { (Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:8000/api/trends' -TimeoutSec 2) | Out-Null; exit 0 } catch { exit 1 }"
 exit /b %errorlevel%

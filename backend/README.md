@@ -19,6 +19,7 @@
 - `SOURCE_INCLUDE_GLOBAL` (false по умолчанию)
 - `TRANSLATE_TO_RU` (true по умолчанию)
 - `SOURCE_RSS_LIMIT`
+- `CALENDAR_ICS_URLS` (список iCal/ICS через запятую)
 - `OLLAMA_BASE_URL`
 - `OLLAMA_MODEL`
 - `OLLAMA_TIMEOUT`

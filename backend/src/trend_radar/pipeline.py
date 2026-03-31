@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from .collectors.calendar_collector import collect_calendar
 from .collectors.rss_collector import collect_rss
 from .config import load_settings
 from .processors.enrich import enrich_items
@@ -12,6 +13,7 @@ from .storage.json_store import write_json
 def run_pipeline(output_path: Path | None = None) -> dict[str, object]:
     settings = load_settings()
     items = collect_rss(settings)
+    items.extend(collect_calendar(settings))
     items = enrich_items(items, settings)
     scored_items = score_items(items)
     output_path = output_path or settings.output_dir / "trends.json"

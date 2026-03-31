@@ -20,6 +20,7 @@ class Settings:
     source_rss_urls: List[str]
     ru_sources: List[str]
     global_sources: List[str]
+    calendar_ics_urls: List[str]
     source_rss_limit: int
     ollama_base_url: str
     ollama_model: str
@@ -65,6 +66,15 @@ def load_settings() -> Settings:
         ru_sources = ru_sources_default
         global_sources = global_sources_default if include_global_sources else []
         source_rss_urls = ru_sources + global_sources
+    calendar_ics_urls_env = os.getenv("CALENDAR_ICS_URLS", "").strip()
+    if calendar_ics_urls_env:
+        calendar_ics_urls = [
+            url.strip() for url in calendar_ics_urls_env.split(",") if url.strip()
+        ]
+    else:
+        calendar_ics_urls = [
+            "https://calendar.google.com/calendar/ical/ru.russian%23holiday%40group.v.calendar.google.com/public/basic.ics"
+        ]
     source_rss_limit = int(os.getenv("SOURCE_RSS_LIMIT", "12"))
     ollama_base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
     ollama_model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
@@ -76,6 +86,7 @@ def load_settings() -> Settings:
         source_rss_urls=source_rss_urls,
         ru_sources=ru_sources,
         global_sources=global_sources,
+        calendar_ics_urls=calendar_ics_urls,
         source_rss_limit=source_rss_limit,
         ollama_base_url=ollama_base_url,
         ollama_model=ollama_model,
