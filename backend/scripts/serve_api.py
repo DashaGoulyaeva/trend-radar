@@ -1,8 +1,23 @@
 ﻿from __future__ import annotations
 
 import argparse
+import site
+import sys
 from pathlib import Path
 from typing import Any
+
+# Ensure local deps and user-site packages are available
+repo_root = Path(__file__).resolve().parents[2]
+local_deps = repo_root / "backend" / ".deps"
+src_path = repo_root / "backend" / "src"
+if local_deps.exists():
+    sys.path.insert(0, str(local_deps))
+if src_path.exists():
+    sys.path.insert(0, str(src_path))
+
+user_site = site.getusersitepackages()
+if user_site and user_site not in sys.path:
+    sys.path.append(user_site)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

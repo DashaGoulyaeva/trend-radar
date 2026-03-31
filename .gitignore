@@ -30,6 +30,11 @@ dist/
 .mypy_cache/
 .ruff_cache/
 .ipynb_checkpoints/
+backend/.deps/
+backend/logs/
+backend/outputs/*
+!backend/outputs/.gitkeep
+backend/data/*.json
 
 # OS
 .DS_Store
