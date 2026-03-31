@@ -211,6 +211,13 @@ a {
   background: transparent;
 }
 
+.warning {
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  color: var(--bad);
+  margin: 8px 0 12px;
+}
+
 .score {
   font-family: "Inter", sans-serif;
   font-size: 1.6rem;

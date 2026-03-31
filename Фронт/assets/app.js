@@ -40,6 +40,7 @@ function normalizeItem(item, fallbackWindow) {
   return {
     id: item.id,
     title: item.title || "Без названия",
+    titleRu: item.title_ru || "",
     score: Number.isFinite(item.score) ? item.score : item.predictive_score,
     verdict: item.verdict || "unknown",
     why: item.why_live || item.whyLive || "",
@@ -56,10 +57,25 @@ function normalizeItem(item, fallbackWindow) {
   };
 }
 
+function isLatin(text) {
+  return /[A-Za-z]/.test(text || "");
+}
+
+function isRuLocale(locale) {
+  return String(locale || "").toLowerCase().includes("ru");
+}
+
 function renderTrendList(target, items, fallbackWindow) {
   target.innerHTML = "";
   items.forEach((raw) => {
     const item = normalizeItem(raw, fallbackWindow);
+    const displayTitle = item.titleRu && isLatin(item.title) ? item.titleRu : item.title;
+    const languageLabel = isRuLocale(item.locale)
+      ? "RU"
+      : isLatin(item.title)
+        ? "EN"
+        : "—";
+    const needsTranslation = languageLabel !== "RU";
     const card = document.createElement("article");
     card.className = "trend";
     card.addEventListener("click", () => {
@@ -68,7 +84,7 @@ function renderTrendList(target, items, fallbackWindow) {
 
     const left = document.createElement("div");
     const title = document.createElement("h3");
-    title.textContent = item.title;
+    title.textContent = displayTitle;
 
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -93,11 +109,15 @@ function renderTrendList(target, items, fallbackWindow) {
     meta.appendChild(updated);
 
     const locale = document.createElement("span");
-    locale.textContent = `locale: ${item.locale}`;
+    locale.textContent = `язык: ${languageLabel}`;
     meta.appendChild(locale);
 
     const why = document.createElement("p");
     why.textContent = item.why || "Ожидаем интерпретацию от Ollama.";
+
+    const warning = document.createElement("div");
+    warning.className = "warning";
+    warning.textContent = "Источник не RU, ожидается перевод.";
 
     const badges = document.createElement("div");
     badges.className = "badges";
@@ -108,15 +128,15 @@ function renderTrendList(target, items, fallbackWindow) {
 
     const risk = document.createElement("span");
     risk.className = "badge";
-    risk.textContent = `risk: ${item.risk}`;
+    risk.textContent = `риск: ${item.risk}`;
 
     const confidence = document.createElement("span");
     confidence.className = "badge";
-    confidence.textContent = `confidence: ${item.confidence}`;
+    confidence.textContent = `уверенность: ${item.confidence}`;
 
     const windowBadge = document.createElement("span");
     windowBadge.className = "badge";
-    windowBadge.textContent = `window: ${item.window}`;
+    windowBadge.textContent = `окно: ${item.window}`;
 
     badges.appendChild(verdict);
     badges.appendChild(risk);
@@ -133,6 +153,9 @@ function renderTrendList(target, items, fallbackWindow) {
     left.appendChild(title);
     left.appendChild(meta);
     left.appendChild(why);
+    if (needsTranslation) {
+      left.appendChild(warning);
+    }
     left.appendChild(badges);
 
     if (item.angles.length) {
@@ -210,21 +233,29 @@ async function loadTrendDetail() {
       return;
     }
     const item = normalizeItem(match, "today");
+    const displayTitle = item.titleRu && isLatin(item.title) ? item.titleRu : item.title;
+    const languageLabel = isRuLocale(item.locale)
+      ? "RU"
+      : isLatin(item.title)
+        ? "EN"
+        : "—";
+    const needsTranslation = languageLabel !== "RU";
     detail.innerHTML = `
       <div class="panel">
-        <h2>${item.title}</h2>
+        <h2>${displayTitle}</h2>
         <p class="subtle">${item.why || "Без интерпретации."}</p>
         <div class="meta">
           <span>Источник: ${item.source}</span>
           <span>captured_at: ${item.capturedAt}</span>
           <span>updated_at: ${item.updatedAt}</span>
-          <span>locale: ${item.locale}</span>
+          <span>язык: ${languageLabel}</span>
         </div>
+        ${needsTranslation ? '<div class="warning">Источник не RU, ожидается перевод.</div>' : ""}
         <div class="badges">
           <span class="badge">${item.verdict}</span>
-          <span class="badge">risk: ${item.risk}</span>
-          <span class="badge">confidence: ${item.confidence}</span>
-          <span class="badge">window: ${item.window}</span>
+          <span class="badge">риск: ${item.risk}</span>
+          <span class="badge">уверенность: ${item.confidence}</span>
+          <span class="badge">окно: ${item.window}</span>
           ${item.window === "week" ? '<span class="badge forecast">прогноз</span>' : ""}
         </div>
         <div class="subtle" style="margin-top: 12px;">Ссылка: ${item.url ? `<a href="${item.url}" target="_blank">${item.url}</a>` : "—"}</div>
