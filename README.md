@@ -25,7 +25,9 @@ scripts\start_all.cmd
 
 Скрипт использует явные пути:
 - Python: `C:\Python314\python.exe`
-- Ollama: `C:\Users\1\AppData\Local\Programs\Ollama\ollama.exe` (если нет в PATH)
+- Ollama: `C:\Users\1\AppData\Local\Programs\Ollama\ollama.exe`
+
+Скрипт запускает API в текущем окне — не закрывай окно, пока нужен сервер.
 
 3. (Опционально) запуск через PowerShell + открыть фронт:
 

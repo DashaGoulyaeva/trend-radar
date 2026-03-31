@@ -8,8 +8,14 @@ echo ===============================
 echo Этот скрипт поднимает Ollama, запускает пайплайн и API.
 echo.
 set "REPO_ROOT=%~dp0.."
+set "PYTHON_EXE=C:\Python314\python.exe"
 set "OLLAMA_EXE=C:\Users\1\AppData\Local\Programs\Ollama\ollama.exe"
-if not exist "%OLLAMA_EXE%" set "OLLAMA_EXE=ollama"
+
+if not exist "%PYTHON_EXE%" (
+  echo Ошибка: Python не найден по пути "%PYTHON_EXE%".
+  echo Установи Python или поправь путь в scripts\start_all.cmd.
+  exit /b 1
+)
 
 pushd "%REPO_ROOT%" >nul
 
@@ -30,20 +36,19 @@ if errorlevel 1 (
 
 echo.
 echo Запуск пайплайна...
-"C:\Python314\python.exe" backend\scripts\run_pipeline.py
+"%PYTHON_EXE%" backend\scripts\run_pipeline.py
 
 echo.
 echo Запуск API...
-start "" "C:\Python314\python.exe" backend\scripts\serve_api.py --host 127.0.0.1 --port 8000
+echo Готово. Открой: "%REPO_ROOT%\Фронт\index.html"
+echo.
 
 if /I "%1"=="front" (
   echo Открываю фронт...
   start "" "%REPO_ROOT%\Фронт\index.html"
 )
 
-echo.
-echo Готово. Открой: "%REPO_ROOT%\Фронт\index.html"
-echo.
+"%PYTHON_EXE%" backend\scripts\serve_api.py --host 127.0.0.1 --port 8000
 
 popd >nul
 exit /b 0
