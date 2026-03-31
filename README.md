@@ -1,52 +1,59 @@
 ﻿# Trend Radar
 
-Локальный редакторский радар трендов для российской аудитории. Фронтенд получает данные из локального API и показывает два окна анализа: сегодня и неделя вперёд.
+Локальный редакторский радар сигналов для российской аудитории. На фронте используется название «Радар трендов».
 
-## Обзор
+## Структура
 
-- Целевая аудитория: ru-RU
-- Окна анализа: `today`, `week`
-- Админ-оценки: `admin_score`, `admin_notes`
+- `Фронт/` — статический фронт (открывается напрямую через `file://`).
+- `backend/` — Python pipeline + API.
+- `docs/` — архитектура и источники.
 
-## Быстрый старт
+## Быстрый запуск (локально)
 
-1. Установить зависимости
+1. Установить зависимости:
 
 ```bash
 npm i
 python -m pip install -r backend/requirements.txt
 ```
 
-2. (Опционально) Запустить Ollama
+2. Запустить всё сразу (Ollama + пайплайн + API):
 
 ```bash
-ollama serve
-ollama run llama3.1
+scripts\start_all.cmd
 ```
 
-3. Запустить пайплайн и API
+3. (Опционально) запуск через PowerShell + открыть фронт:
 
 ```bash
-python backend/scripts/run_pipeline.py --output backend/outputs/trends.json
-python backend/scripts/serve_api.py --host 127.0.0.1 --port 8000
+scripts\start_all.ps1 -OpenFront
 ```
 
-4. Запустить фронтенд
+4. Открыть фронт вручную:
 
-```bash
-npm run dev
+```
+Фронт\index.html
 ```
 
-Фронтенд ожидает API по `http://127.0.0.1:8000/api/trends`.
+UI ожидает API по `http://127.0.0.1:8000/api/trends`.
 
-## Архитектура
+## Автозапуск
 
-- `backend/` — Python pipeline + API
-- `src/` — React UI (Vite)
-- `docs/` — архитектура, источники, roadmap
+- Task Scheduler (ONLOGON): `scripts\start_all.ps1 -InstallAutostart`
+- Если нужны админ-права: `scripts\start_all.ps1 -InstallAutostart -Elevate`
+- Startup folder: создаётся `TrendRadar_StartAll.cmd` в `"%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"`
 
-## Документация
+Поднять фронт сразу: `scripts\start_all.cmd front`
 
-- `docs/ARCHITECTURE.md`
-- `docs/DATA_SOURCES.md`
-- `docs/ROADMAP.md`
+## Конфиг (.env)
+
+Скопируй `backend/.env.example` в `backend/.env` и при необходимости измени:
+
+- `SOURCE_RSS_URL` (один источник)
+- `SOURCE_RSS_URLS` (список через запятую)
+- `SOURCE_INCLUDE_GLOBAL` (по умолчанию `false`)
+- `TRANSLATE_TO_RU` (по умолчанию `true`)
+- `SOURCE_RSS_LIMIT`
+- `OLLAMA_BASE_URL` (по умолчанию `http://localhost:11434`)
+- `OLLAMA_MODEL` (по умолчанию `llama3.2:3b`)
+- `OLLAMA_TIMEOUT`
