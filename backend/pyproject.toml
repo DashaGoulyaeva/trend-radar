@@ -11,6 +11,10 @@ dependencies = [
   "feedparser>=6.0"
 ]
 
+[project.scripts]
+trend-radar-pipeline = "trend_radar.pipeline:main"
+trend-radar-api = "trend_radar.api:main"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 

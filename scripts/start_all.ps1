@@ -1,4 +1,4 @@
-param(
+﻿param(
     [switch]$OpenFront,
     [switch]$Elevate,
     [switch]$InstallAutostart
@@ -24,17 +24,36 @@ if ($Elevate -and -not (Test-Admin)) {
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $ollamaUrl = "http://127.0.0.1:11434/api/tags"
 $apiUrl = "http://127.0.0.1:8000/api/trends"
-$ollamaExe = "C:\Users\1\AppData\Local\Programs\Ollama\ollama.exe"
-$pythonExe = "C:\Python314\python.exe"
-$depsPath = Join-Path $repoRoot "backend\.deps"
 
-if (-not (Test-Path $pythonExe)) {
-    Write-Host "Ошибка: Python не найден по пути $pythonExe."
+function Resolve-Python {
+    $cmd = Get-Command python -ErrorAction SilentlyContinue
+    if ($cmd) { return @($cmd.Path) }
+    $py = Get-Command py -ErrorAction SilentlyContinue
+    if ($py) { return @($py.Path, "-3") }
+    return $null
+}
+
+function Resolve-Ollama {
+    $cmd = Get-Command ollama -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Path }
+    $fallback = Join-Path $env:LOCALAPPDATA "Programs\Ollama\ollama.exe"
+    if (Test-Path $fallback) { return $fallback }
+    return $null
+}
+
+$pythonCmd = Resolve-Python
+if (-not $pythonCmd) {
+    Write-Host "Ошибка: Python не найден в PATH. Установи Python или добавь в PATH."
     exit 1
 }
 
-if (-not (Test-Path $ollamaExe)) {
-    Write-Host "Предупреждение: Ollama не найдена по пути $ollamaExe. Продолжаю без автозапуска Ollama."
+$pythonExe = $pythonCmd[0]
+$pythonArgs = @()
+if ($pythonCmd.Length -gt 1) { $pythonArgs += $pythonCmd[1] }
+
+$ollamaExe = Resolve-Ollama
+if (-not $ollamaExe) {
+    Write-Host "Предупреждение: Ollama не найдена в PATH. Продолжаю без автозапуска Ollama."
 }
 
 function Test-Url([string]$url) {
@@ -47,14 +66,10 @@ function Test-Url([string]$url) {
 }
 
 function Ensure-Deps {
-    if (-not (Test-Path $depsPath)) {
-        New-Item -ItemType Directory -Path $depsPath | Out-Null
-    }
-    $check = "import sys; from pathlib import Path; repo=Path(r'$repoRoot'); deps=repo/'backend'/'.deps'; src=repo/'backend'/'src'; sys.path[:0]=[str(deps), str(src)]; import icalendar"
-    & $pythonExe -c $check | Out-Null
+    & $pythonCmd -c "import trend_radar" | Out-Null
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Устанавливаю зависимости в backend\.deps..."
-        & $pythonExe -m pip install -r "$repoRoot\backend\requirements.txt" --target "$repoRoot\backend\.deps"
+        Write-Host "Устанавливаю зависимости (editable) в backend..."
+        & $pythonCmd -m pip install -e "$repoRoot\backend"
         if ($LASTEXITCODE -ne 0) { return $false }
     }
     return $true
@@ -65,7 +80,7 @@ if (-not (Ensure-Deps)) {
 }
 
 if (-not (Test-Url $ollamaUrl)) {
-    if (Test-Path $ollamaExe) {
+    if ($ollamaExe) {
         Write-Host "Ollama не запущена. Пытаюсь стартовать..."
         try {
             Start-Process -WindowStyle Minimized -FilePath $ollamaExe -ArgumentList "serve"
@@ -85,22 +100,16 @@ if (Test-Url $ollamaUrl) {
 }
 
 Write-Host "Запуск пайплайна..."
-& $pythonExe "$repoRoot\backend\scripts\run_pipeline.py"
+& $pythonCmd -m trend_radar.pipeline
 
 Write-Host "Запуск API..."
-Start-Process -FilePath $pythonExe -ArgumentList "$repoRoot\backend\scripts\serve_api.py --host 127.0.0.1 --port 8000"
+Start-Process -FilePath $pythonExe -ArgumentList ($pythonArgs + "-m trend_radar.api") -WindowStyle Minimized
 
 Start-Sleep -Seconds 2
 if (Test-Url $apiUrl) {
     Write-Host "API доступен: $apiUrl"
 } else {
     Write-Host "API недоступен по $apiUrl"
-}
-
-if (Test-Url $ollamaUrl) {
-    Write-Host "Ollama доступна: $ollamaUrl"
-} else {
-    Write-Host "Ollama недоступна: $ollamaUrl"
 }
 
 if ($OpenFront) {

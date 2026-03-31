@@ -16,6 +16,7 @@ def _resolve(path_value: str) -> Path:
 class Settings:
     data_dir: Path
     output_dir: Path
+    db_path: Path
     admin_overrides_path: Path
     source_rss_urls: List[str]
     ru_sources: List[str]
@@ -33,6 +34,7 @@ def load_settings() -> Settings:
     load_dotenv()
     data_dir = _resolve(os.getenv("TREND_RADAR_DATA_DIR", "backend/data"))
     output_dir = _resolve(os.getenv("TREND_RADAR_OUTPUT_DIR", "backend/outputs"))
+    db_path = _resolve(os.getenv("TREND_RADAR_DB_PATH", str(data_dir / "trend_radar.sqlite3")))
     admin_overrides_path = _resolve(
         os.getenv("TREND_RADAR_ADMIN_OVERRIDES", "backend/data/admin_overrides.json")
     )
@@ -82,6 +84,7 @@ def load_settings() -> Settings:
     return Settings(
         data_dir=data_dir,
         output_dir=output_dir,
+        db_path=db_path,
         admin_overrides_path=admin_overrides_path,
         source_rss_urls=source_rss_urls,
         ru_sources=ru_sources,
@@ -94,3 +97,4 @@ def load_settings() -> Settings:
         translate_to_ru=translate_to_ru,
         include_global_sources=include_global_sources,
     )
+

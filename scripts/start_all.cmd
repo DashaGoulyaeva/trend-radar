@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 chcp 65001 >nul
 setlocal
 
@@ -8,19 +8,14 @@ echo ===============================
 echo Этот скрипт поднимает Ollama, запускает пайплайн и API.
 echo.
 set "REPO_ROOT=%~dp0.."
-set "PYTHON_EXE=C:\Python314\python.exe"
-set "OLLAMA_EXE=C:\Users\1\AppData\Local\Programs\Ollama\ollama.exe"
 
-if not exist "%PYTHON_EXE%" (
-  echo Ошибка: Python не найден по пути "%PYTHON_EXE%".
-  echo Установи Python или поправь путь в scripts\start_all.cmd.
+call :find_python
+if not defined PYTHON_FILE (
+  echo Ошибка: Python не найден в PATH. Установи Python или добавь в PATH.
   exit /b 1
 )
 
-if not exist "%OLLAMA_EXE%" (
-  echo Предупреждение: Ollama не найдена по пути "%OLLAMA_EXE%".
-  echo Продолжаю без автозапуска Ollama.
-)
+call :find_ollama
 
 pushd "%REPO_ROOT%" >nul
 
@@ -31,9 +26,9 @@ if errorlevel 1 (
 
 call :check_ollama
 if errorlevel 1 (
-  if exist "%OLLAMA_EXE%" (
+  if defined OLLAMA_FILE (
     echo Ollama не запущена. Пытаюсь стартовать...
-    start "" /min "%OLLAMA_EXE%" serve
+    powershell -NoProfile -Command "Start-Process -FilePath '%OLLAMA_FILE%' -ArgumentList 'serve' -WindowStyle Minimized"
     powershell -NoProfile -Command "Start-Sleep -Seconds 2"
     call :check_ollama
     if errorlevel 1 (
@@ -50,11 +45,11 @@ if errorlevel 1 (
 
 echo.
 echo Запуск пайплайна...
-"%PYTHON_EXE%" backend\scripts\run_pipeline.py
+call "%PYTHON_FILE%" %PYTHON_ARGS% -m trend_radar.pipeline
 
 echo.
 echo Запуск API...
-powershell -NoProfile -Command "Start-Process -FilePath '%PYTHON_EXE%' -ArgumentList 'backend\\scripts\\serve_api.py --host 127.0.0.1 --port 8000' -WindowStyle Minimized"
+powershell -NoProfile -Command "Start-Process -FilePath '%PYTHON_FILE%' -ArgumentList '%PYTHON_ARGS% -m trend_radar.api' -WindowStyle Minimized"
 
 powershell -NoProfile -Command "Start-Sleep -Seconds 2"
 
@@ -65,34 +60,41 @@ if errorlevel 1 (
   echo API доступен: http://127.0.0.1:8000/api/trends
 )
 
-call :check_ollama
-if errorlevel 1 (
-  echo Ollama недоступна по http://127.0.0.1:11434/api/tags
-) else (
-  echo Ollama доступна: http://127.0.0.1:11434/api/tags
-)
-
-echo.
-echo Готово. Открой: "%REPO_ROOT%\web\index.html"
-echo.
-
-if /I "%1"=="front" (
-  echo Открываю фронт...
-  start "" "%REPO_ROOT%\web\index.html"
-)
-
-echo Окно можно закрыть, когда API больше не нужен.
 popd >nul
 exit /b 0
 
-:ensure_deps
-if not exist "%REPO_ROOT%\backend\.deps" (
-  mkdir "%REPO_ROOT%\backend\.deps" >nul 2>nul
+:find_python
+set "PYTHON_FILE="
+set "PYTHON_ARGS="
+where python >nul 2>nul
+if %errorlevel%==0 (
+  set "PYTHON_FILE=python"
+  exit /b 0
 )
-"%PYTHON_EXE%" -c "import sys; from pathlib import Path; repo=Path(r'%REPO_ROOT%'); deps=repo/'backend'/'.deps'; src=repo/'backend'/'src'; sys.path[:0]=[str(deps), str(src)]; import icalendar" >nul 2>nul
+where py >nul 2>nul
+if %errorlevel%==0 (
+  set "PYTHON_FILE=py"
+  set "PYTHON_ARGS=-3"
+)
+exit /b 0
+
+:find_ollama
+set "OLLAMA_FILE="
+where ollama >nul 2>nul
+if %errorlevel%==0 (
+  set "OLLAMA_FILE=ollama"
+  exit /b 0
+)
+if exist "%LOCALAPPDATA%\Programs\Ollama\ollama.exe" (
+  set "OLLAMA_FILE=%LOCALAPPDATA%\Programs\Ollama\ollama.exe"
+)
+exit /b 0
+
+:ensure_deps
+call "%PYTHON_FILE%" %PYTHON_ARGS% -c "import trend_radar" >nul 2>nul
 if errorlevel 1 (
-  echo Устанавливаю зависимости в backend\.deps...
-  "%PYTHON_EXE%" -m pip install -r backend\requirements.txt --target backend\.deps
+  echo Устанавливаю зависимости (editable) в backend...
+  call "%PYTHON_FILE%" %PYTHON_ARGS% -m pip install -e backend
   if errorlevel 1 exit /b 1
 )
 exit /b 0

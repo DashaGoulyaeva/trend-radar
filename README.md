@@ -3,7 +3,7 @@
 Trend Radar is a trend radar for editors: an RSS/news collector plus a scoring pipeline that turns raw signals into a local dashboard. It runs a Python backend for ingestion, normalization, and scoring, and ships a static frontend for browsing the curated feed.
 
 Quickstart (local):
-1. Install deps (optional): `C:\Python314\python.exe -m pip install -r backend\requirements.txt --target backend\.deps`
+1. Install deps (optional): `C:\\Python314\\python.exe -m pip install -e backend`
 2. Run everything: `scripts\start_all.cmd`
 3. Open the UI: `web\index.html` (or `scripts\start_all.ps1 -OpenFront`)
 
@@ -24,7 +24,7 @@ Project structure (one paragraph): `web/` is the static frontend, `backend/` is 
 1. (Опционально) установить зависимости в локальную папку:
 
 ```bash
-C:\Python314\python.exe -m pip install -r backend\requirements.txt --target backend\.deps
+C:\\Python314\\python.exe -m pip install -e backend
 ```
 
 Скрипт запуска также ставит зависимости автоматически, если не хватает модулей (например, `icalendar`).
@@ -76,3 +76,4 @@ UI ожидает API по `http://127.0.0.1:8000/api/trends`.
 - `OLLAMA_BASE_URL` (по умолчанию `http://localhost:11434`)
 - `OLLAMA_MODEL` (по умолчанию `llama3.2:3b`)
 - `OLLAMA_TIMEOUT`
+
