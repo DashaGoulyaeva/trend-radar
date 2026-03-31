@@ -1,52 +1,54 @@
-# Trend Radar backend (Python)
+﻿# Trend Radar backend (Python)
 
-Python-пайплайн + минимальный API с RSS-ингестом и Ollama-обогащением.
+Пайплайн сбора/обогащения и минимальный API для фронтенда.
 
-## Минимальный запуск
+## Требования
 
-1. Установить зависимости:
-
-```bash
-python -m pip install -r backend/requirements.txt
-```
-
-2. Запустить Ollama и модель:
-
-```bash
-ollama serve
-ollama run llama3.2:3b
-```
-
-3. Запустить пайплайн и API:
-
-```bash
-python backend/scripts/run_pipeline.py --output backend/outputs/trends.json
-python backend/scripts/serve_api.py --host 127.0.0.1 --port 8000
-```
+- Python 3.10+
+- Ollama (опционально, для обогащения)
 
 ## Конфиг (.env)
 
-Скопируй `backend/.env.example` в `backend/.env` и при необходимости измени:
+Скопируйте `backend/.env.example` в `backend/.env` и при необходимости измените:
 
-- `SOURCE_RSS_URL` (по умолчанию `https://news.ycombinator.com/rss`)
+- `TREND_RADAR_DATA_DIR`
+- `TREND_RADAR_OUTPUT_DIR`
+- `TREND_RADAR_ADMIN_OVERRIDES`
+- `SOURCE_RSS_URL`
 - `SOURCE_RSS_LIMIT`
-- `OLLAMA_BASE_URL` (по умолчанию `http://localhost:11434`)
-- `OLLAMA_MODEL` (по умолчанию `llama3.2:3b`)
+- `OLLAMA_BASE_URL`
+- `OLLAMA_MODEL`
 - `OLLAMA_TIMEOUT`
 
-## Structure
+## Pipeline
 
-- `src/trend_radar/` — pipeline modules
-- `scripts/` — runnable entrypoints
-- `data/` — raw and processed source data
-- `outputs/` — API-ready trend payloads
-- `logs/` - runtime logs
+```bash
+python backend/scripts/run_pipeline.py --output backend/outputs/trends.json
+```
 
-## Data contract (stub)
+Результат пишется в `backend/outputs/trends.json`.
 
-Each trend item currently exposes placeholder fields for the product contract:
+## API
+
+Запуск:
+
+```bash
+python backend/scripts/serve_api.py --host 127.0.0.1 --port 8000
+```
+
+Эндпоинты:
+
+- `GET /api/trends` — список трендов (с применёнными админ-оверрайдами)
+- `PATCH /api/trends/{trend_id}/admin` — записать админ-правки
+
+Админ-правки сохраняются в `backend/data/admin_overrides.json`.
+
+## Контракт данных (stub)
+
+Каждый тренд содержит поля:
 
 - `window`: `today` | `week`
-- `admin_score` and `admin_notes`
-- `locale` (defaults to `ru-RU`)
-- `region_bias_score` (float, stubbed)
+- `admin_score`: int (заглушка)
+- `admin_notes`: list[string]
+- `locale`: по умолчанию `ru-RU`
+- `region_bias_score`: float (заглушка)

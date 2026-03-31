@@ -32,11 +32,13 @@ def collect_rss(settings: Settings) -> list[TrendItem]:
         stable_key = title or link or f"rss-{index}"
         item_id = f"rss-{_hash_id(stable_key)}"
         score = max(40, 100 - index * 4)
+        window = "today" if index < max(1, settings.source_rss_limit // 2) else "week"
 
         items.append(
             TrendItem(
                 id=item_id,
                 title=title or "Untitled signal",
+                window=window,
                 score=score,
                 predictive_score=0,
                 verdict="unknown",
