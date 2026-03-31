@@ -26,6 +26,12 @@ class TrendItem:
     predictive_score: int
     verdict: str
     evidence: list[Evidence]
+    emotion: str = ""
+    confidence: float | None = None
+    source: str = ""
+    source_url: str = ""
+    captured_at: str | None = None
+    updated_at: str | None = None
     admin_score: int | None = None
     admin_notes: list[str] | None = None
     admin_note: str = ""
@@ -47,6 +53,10 @@ class TrendItem:
         payload["angles"] = self.angles or []
         payload["axes"] = [axis for axis in payload["axes"]] if payload["axes"] else []
         payload["evidence"] = [ev for ev in payload["evidence"]]
+        if not payload.get("source") and payload["evidence"]:
+            payload["source"] = payload["evidence"][0].get("source_key", "")
+        if not payload.get("source_url") and payload["evidence"]:
+            payload["source_url"] = payload["evidence"][0].get("url") or ""
         return payload
 
 

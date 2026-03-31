@@ -36,11 +36,42 @@ def _apply_overrides(payload: dict[str, Any], overrides: dict[str, Any]) -> dict
     return {"items": items}
 
 
+def _normalize_item(item: dict[str, Any]) -> dict[str, Any]:
+    defaults = {
+        "id": "",
+        "title": "",
+        "why_live": "",
+        "score": 0,
+        "verdict": "",
+        "scene": "",
+        "angles": [],
+        "risk": "",
+        "window": "today",
+        "admin_score": None,
+        "admin_notes": [],
+        "emotion": "",
+        "confidence": None,
+        "source": "",
+        "source_url": "",
+        "captured_at": None,
+        "updated_at": None,
+        "locale": "ru-RU",
+        "region_bias_score": 0.0,
+    }
+    for key, value in defaults.items():
+        item.setdefault(key, value)
+    return item
+
+
 @app.get("/api/trends")
-async def get_trends() -> dict[str, Any]:
+async def get_trends(window: str | None = None) -> dict[str, Any]:
     payload = read_json(trends_path) if trends_path.exists() else {"items": []}
     overrides = _load_overrides()
-    return _apply_overrides(payload, overrides)
+    applied = _apply_overrides(payload, overrides)
+    items = [_normalize_item(item) for item in applied.get("items", [])]
+    if window in {"today", "week"}:
+        items = [item for item in items if item.get("window") == window]
+    return {"items": items}
 
 
 @app.patch("/api/trends/{trend_id}/admin")

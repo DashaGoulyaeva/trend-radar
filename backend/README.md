@@ -39,6 +39,7 @@ python backend/scripts/serve_api.py --host 127.0.0.1 --port 8000
 Эндпоинты:
 
 - `GET /api/trends` — список трендов (с применёнными админ-оверрайдами)
+- `GET /api/trends?window=today|week` — фильтр по окну анализа
 - `PATCH /api/trends/{trend_id}/admin` — записать админ-правки
 
 Админ-правки сохраняются в `backend/data/admin_overrides.json`.
@@ -52,6 +53,9 @@ python backend/scripts/serve_api.py --host 127.0.0.1 --port 8000
 - `admin_notes`: list[string]
 - `locale`: по умолчанию `ru-RU`
 - `region_bias_score`: float (заглушка)
+- `emotion`, `confidence`
+- `source`, `source_url`
+- `captured_at`, `updated_at`
 
 ## CORS (file://)
 
